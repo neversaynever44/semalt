@@ -13,7 +13,7 @@
 
 <script>
     export default {
-        name: "Loading",
+        name: "Preloader",
         data: function () {
             return {}
         },
@@ -29,7 +29,7 @@
   .dialog.centered-dialog,
   .v-dialog.centered-dialog
  {
-    background: #282c2dad;
+    /*background: #282c2dad;*/
     box-shadow: none;
     border-radius: 6px;
     width: auto;
