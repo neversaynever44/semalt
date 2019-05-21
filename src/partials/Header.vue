@@ -6,7 +6,7 @@
           <!-- <router-link to="/dashboard"> -->
             <v-list-tile avatar>
               <v-list-tile-avatar>
-                <img src="https://randomuser.me/api/portraits/men/85.jpg" >
+                  <v-icon>home</v-icon>
               </v-list-tile-avatar>
               <v-list-tile-content>
                 <v-list-tile-title>Max Max</v-list-tile-title>
