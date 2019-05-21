@@ -1,9 +1,57 @@
 <template>
   <v-flex xs12 row>
     
+  <v-layout py-3>
+           <v-flex xs12>
+          
+<h1>Opportunities</h1>
+        <ul>
+            <li v-for="(val, i) in opportunityAudits" :key="i">
+                <h1>Title: {{val.title}}</h1>
+                <h2>Id: {{val.id}}</h2>
+                <h3>Description: {{val.description}}</h3>
+                <p>Group: {{val.group}}</p>
+                <p>Score: {{val.score}}</p>
+                <p>scoreDisplayMode: {{val.scoreDisplayMode}}</p>
+            </li>
+        </ul>
+
+
+       <h1>DIAGNOSTIC</h1>
+        <ul>
+            <li v-for="(val, i) in diagnosticAudits" :key="i">
+                <h1>Title: {{val.title}}</h1>
+                <h2>Id: {{val.id}}</h2>
+                <h3>Description: {{val.description}}</h3>
+                <p>Group: {{val.group}}</p>
+                <p>Score: {{val.score}}</p>
+                <p>scoreDisplayMode: {{val.scoreDisplayMode}}</p>
+            </li>
+        </ul>
+
+        <h1>AUDIT</h1>
+        <ul>
+           <li v-for="(val, i) in passedAudits" :key="i">
+               <h1>Title: {{val.title}}</h1>
+               <h2>Id: {{val.id}}</h2>
+               <h3>Description: {{val.description}}</h3>
+               <p>Group: {{val.group}}</p>
+               <p>Score: {{val.score}}</p>
+               <p>scoreDisplayMode: {{val.scoreDisplayMode}}</p>
+           </li>
+        </ul>
+
+
+        </v-flex>
+
+  </v-layout>
 
   <v-layout py-3>
+
+ 
+
         <v-flex xs12 sm10 offset-sm1>
+
           <v-card>
             <v-card-title>
               <div class="title">Nutrition Table</div>
@@ -60,13 +108,22 @@
 </template>
 
 <script>
+  import axios from "axios";
 
   export default {
     name: 'Dashboard',
     data () {
       return {
+        audits: [],
         search: '',
         selected: [],
+        PASS_THRESHOLD: 0.9,
+        RATINGS: {
+          PASS: {label: 'pass', minScore: this.PASS_THRESHOLD},
+          AVERAGE: {label: 'average', minScore: 0.5},
+          FAIL: {label: 'fail'},
+          ERROR: {label: 'error'},
+        },
         headers: [
           {
             text: 'Dessert (100g serving)',
@@ -174,7 +231,84 @@
         ]
       }
     },
-    created: function(){
+    methods: {
+       _getWastedMs(audit) {
+                if(audit.group === "load-opportunities") {
+                    console.log(audit.details.overallSavingsMs)
+                    return audit.details.overallSavingsMs;
+                } else {
+                    return this.RATINGS.minScore;
+                }
+            },
+       showAsPassed(audit) {
+          switch (audit.scoreDisplayMode) {
+              case 'manual':
+              case 'notApplicable':
+                  return true;
+              case 'error':
+              case 'informative':
+                  return false;
+              case 'numeric':
+              case 'binary':
+              default:
+                  return Number(audit.score) >= this.RATINGS.PASS.minScore;
+          }
+        },
+
+      fetchData() {
+        const URL = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed/?url=https://habr.com/`,
+              vm = this;
+        axios.get(URL).then(function(res) {
+          const data = res.data.lighthouseResult,
+                dataAudits = Object.values(data.audits),
+                dataRefs  = data.categories.performance.auditRefs;
+
+          const itemsMap = dataAudits.reduce((map, item) => {
+                           map[item.id] = item
+                              return map
+                          }, {})
+            vm.audits = dataRefs
+                          .filter((item) => itemsMap.hasOwnProperty(item.id))
+                          .map((item) => ({
+                            description: itemsMap[item.id].description,
+                            details: itemsMap[item.id].details,
+                            displayValue: itemsMap[item.id].displayValue,
+                            id: item.id,
+                            group: item.group,
+                            score: itemsMap[item.id].score,
+                            scoreDisplayMode: itemsMap[item.id].scoreDisplayMode,
+                            title: itemsMap[item.id].title,
+                        }));
+           })
+      }
+      
+    },
+    computed: {
+      opportunityAudits() {
+        const opportunityAudits = this.audits
+              .filter(audit => audit.group === 'load-opportunities' && !this.showAsPassed(audit))
+              .sort((auditA, auditB) => this._getWastedMs(auditB) - this._getWastedMs(auditA));
+        return opportunityAudits;
+      },
+      diagnosticAudits() {
+        const diagnosticAudits = this.audits
+              .filter(audit => audit.group === 'diagnostics' && !this.showAsPassed(audit))
+              .sort((a, b) => {
+                  const scoreA = a.scoreDisplayMode === 'informative' ? 100 : Number(a.score);
+                  const scoreB = b.scoreDisplayMode === 'informative' ? 100 : Number(b.score);
+                  return scoreA - scoreB;
+              });
+        return diagnosticAudits;
+      },
+       passedAudits() {
+          const passedAudits = this.audits
+                  .filter(audit => (audit.group === 'load-opportunities' || audit.group === 'diagnostics') &&
+              this.showAsPassed(audit));
+          return passedAudits;
+      }
+    },
+    created(){
+      this.fetchData();
     }
   }
 </script>
