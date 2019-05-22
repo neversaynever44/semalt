@@ -306,7 +306,7 @@
        passedAudits() {
           const passedAudits = this.audits
                   .filter(audit => (audit.group === 'load-opportunities' || audit.group === 'diagnostics') &&
-              this.showAsPassed(audit));
+              !this.showAsPassed(audit));
           return passedAudits;
       }
     },
