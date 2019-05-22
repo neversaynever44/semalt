@@ -1,6 +1,6 @@
 <template>
   <v-flex xs12 row>
-<v-layout py-3>
+    <v-layout py-3>
 
  
 <!-- <v-flex xs12 sm10 offset-sm1> -->
@@ -39,7 +39,7 @@
                   <td>{{ props.index+1 }}</td>
                 <td>{{ props.item.title }}</td>
                 <td class="text-xs-left">{{ props.item.id }}</td>
-                <td class="text-xs-left">{{ props.item.description }}</td>
+                <td class="text-xs-left">{{ props.item.displayValue }}</td>
                 <td class="text-xs-left">{{ props.item.group }}</td>
                 <td class="text-xs-left">
                   {{ props.item.score }}
@@ -88,7 +88,7 @@
                   <td>{{ props.index+1 }}</td>
                 <td>{{ props.item.title }}</td>
                 <td class="text-xs-left">{{ props.item.id }}</td>
-                <td class="text-xs-left">{{ props.item.description }}</td>
+                <td class="text-xs-left">{{ props.item.displayValue }}</td>
                 <td class="text-xs-left">{{ props.item.group }}</td>
                 <td class="text-xs-left">
                   {{ props.item.score }}
@@ -143,7 +143,7 @@
                   <td>{{ props.index+1 }}</td>
                 <td>{{ props.item.title }}</td>
                 <td class="text-xs-left">{{ props.item.id }}</td>
-                <td class="text-xs-left">{{ props.item.description }}</td>
+                <td class="text-xs-left">{{ props.item.displayValue }}</td>
                 <td class="text-xs-left">{{ props.item.group }}</td>
                 <td class="text-xs-left">
                   {{ props.item.score }}
@@ -208,10 +208,10 @@
             value: 'title'
           },
           { text: 'Id', value: 'id' },
-          { text: 'Description', value: 'description' },
-          { text: 'Group', value: 'group' },
+          { text: 'Value', value: 'displayValue', sortable: false },
+          { text: 'Group', value: 'group', sortable: false },
           { text: 'Score', value: 'score' },
-          { text: 'scoreDisplayMode', value: 'scoreDisplayMode' }
+          { text: 'scoreDisplayMode', value: 'scoreDisplayMode', sortable: false }
         ],
        
       }
